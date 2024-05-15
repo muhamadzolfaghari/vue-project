@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // The simplest way how VUE reacive is worked!
+        function reactive(obj, render) {
+            const target = { ...obj };
+
+            const handler = {
+                get(target, prop) {
+                    return target[prop];
+                },
+                set(target, prop, value) {
+                    console.log("previous value", target[prop]);
+                    console.log("new value", value);
+                    target[prop] = value;
+                    render();
+                    return true; // to reflex to that 
+                },
+            };
+
+            return new Proxy(target, handler); // using proxy to prevent from create getter and setter manually for object.
+        }
+
+        const state = reactive({
+            time: Date.now(), // inititlize state
+            // use the function to immutablity updating time
+            updateTime() {
+                this.time = Date.now();
+            },
+        }, render);
+
+        // a sample render function to reflex the code in html base
+        function render() {
+            // using template stirng to get state.time and also using updateTime 
+            document.body.innerHTML = `
+    <div>
+      <button onclick="state.updateTime()">Update Time</button>
+      <h1>The current time: ${state.time}</h1>
+    </div>
+  `;
+        }
+
+        // render the code for first-time
+        render();
+    </script>
+</body>
+
+</html>
